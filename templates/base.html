@@ -2,37 +2,79 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>EventPlannerCommunity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#E11D48',
+            secondary: '#FB7185',
+            accent: '#2563EB',
+            background: '#FFF1F2',
+            foreground: '#881337',
+            card: '#FFFFFF',
+            muted: '#F0ECF2',
+            'muted-foreground': '#475569',
+            border: '#FECDD3',
+            destructive: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter','sans-serif'],
+            serif: ['Playfair Display','serif'],
+          },
+          boxShadow: {
+            soft: '0 4px 20px -4px rgba(225,29,72,0.15)',
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body { font-family: Helvetica, Arial, sans-serif; max-width: 920px; margin: 20px auto; padding: 0 12px; }
-    nav { margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #ddd; }
-    .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin: 10px 0; background: #f9f9f9; }
-    .btn { padding: 6px 10px; margin: 2px; border: 1px solid #999; border-radius: 4px; background: #eee; cursor: pointer; text-decoration: none; color: #000; display: inline-block; }
-    .btn-primary { background: #007bff; color: #fff; border-color: #007bff; }
-    .btn-danger { background: #dc3545; color: #fff; border-color: #dc3545; }
-    label { font-weight: bold; display: block; margin-top: 8px; }
-    input, textarea, select { width: 100%; padding: 6px; margin: 4px 0 10px; box-sizing: border-box; }
-    .row { display: flex; gap: 10px; }
-    .row > div { flex: 1; }
-    ul.flash { color: #333; background: #fff3cd; padding: 8px 12px; border: 1px solid #ffeeba; border-radius: 4px; list-style: none; }
+    body { font-family: 'Inter', sans-serif; }
+    .font-serif { font-family: 'Playfair Display', serif; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
   </style>
 </head>
-<body>
-  <nav>
-    <a href="{{ url_for('index') }}">Cerca</a> |
-    <a href="{{ url_for('create') }}">Crea</a> |
-    <a href="{{ url_for('chart') }}">Grafico</a> |
-    {% if session.get('user') %}
-      Utente: <strong>{{ session['user'] }}</strong> | <a href="{{ url_for('logout') }}">Logout</a>
-    {% else %}
-      <a href="{{ url_for('login') }}">Login</a>
-    {% endif %}
-  </nav>
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="flash">{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>
-    {% endif %}
-  {% endwith %}
-  {% block content %}{% endblock %}
+<body class="bg-background text-foreground min-h-screen">
+  <header class="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-border">
+    <nav class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+      <a href="{{ url_for('index') }}" class="font-serif text-2xl font-semibold text-primary">EventPlanner</a>
+      <div class="flex flex-wrap items-center gap-2 text-sm">
+        <a href="{{ url_for('index') }}" class="px-3 py-1.5 rounded-full hover:bg-muted transition">Cerca</a>
+        <a href="{{ url_for('create') }}" class="px-3 py-1.5 rounded-full hover:bg-muted transition">Crea</a>
+        <a href="{{ url_for('chart') }}" class="px-3 py-1.5 rounded-full hover:bg-muted transition">Grafico</a>
+      </div>
+      <div class="ml-auto flex items-center gap-2 text-sm">
+        {% if session.get('user') %}
+          <span class="px-3 py-1.5 rounded-full bg-muted text-muted-foreground">👤 {{ session['user'] }}</span>
+          <a href="{{ url_for('logout') }}" class="px-3 py-1.5 rounded-full border border-border hover:bg-muted transition">Logout</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="px-3 py-1.5 rounded-full bg-primary text-white hover:bg-primary/90 transition">Login</a>
+          <a href="{{ url_for('register') }}" class="px-3 py-1.5 rounded-full border border-primary text-primary hover:bg-primary/10 transition">Registrati</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="mb-4 space-y-2">
+          {% for m in messages %}
+            <div class="px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-sm">{{ m }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>
