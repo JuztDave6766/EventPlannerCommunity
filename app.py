@@ -20,6 +20,11 @@ def get_engine():
 def create_app(db_path=None, json_path=None):
     app = Flask(__name__, template_folder="templates", static_folder="static")
     app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-me")
+    app.config.update(
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Lax",
+        SESSION_COOKIE_SECURE=False,
+    )
     app.config["ENGINE"] = PublicEngine(
         db_path=db_path or os.environ.get("DB_PATH", "event_organizer.db"),
         json_path=json_path or os.environ.get("JSON_PATH", "public_events.json"),
@@ -65,14 +70,37 @@ def create_app(db_path=None, json_path=None):
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if request.method == "POST":
-            name = request.form.get("username", "").strip()
-            if not name:
-                flash("Inserisci un nome utente")
-                return redirect(url_for("login"))
-            session["user"] = name
-            flash(f"Benvenuto, {name}")
-            return redirect(url_for("index"))
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
+            engine = get_engine()
+            if engine.verify_user(username, password):
+                session["user"] = username
+                flash(f"Benvenuto, {username}")
+                return redirect(url_for("index"))
+            flash("Credenziali non valide o utente non registrato")
+            return redirect(url_for("login"))
         return render_template("login.html")
+
+    @app.route("/register", methods=["GET", "POST"])
+    def register():
+        if request.method == "POST":
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
+            confirm = request.form.get("confirm", "")
+            if not username or not password:
+                flash("Compila tutti i campi")
+                return redirect(url_for("register"))
+            if password != confirm:
+                flash("Le password non coincidono")
+                return redirect(url_for("register"))
+            engine = get_engine()
+            if not engine.register_user(username, password):
+                flash("Utente gia' esistente o errore")
+                return redirect(url_for("register"))
+            session["user"] = username
+            flash("Registrazione completata")
+            return redirect(url_for("index"))
+        return render_template("register.html")
 
     @app.route("/logout")
     def logout():

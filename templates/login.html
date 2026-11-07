@@ -4,7 +4,9 @@
 <form method="post" action="{{ url_for('login') }}">
   <label>👤 Nome utente</label>
   <input type="text" name="username" required>
+  <label>🔒 Password</label>
+  <input type="password" name="password" required>
   <button type="submit" class="btn btn-primary">Entra</button>
 </form>
-<p><small>Nessuna password: inserisci un nome utente per pubblicare e gestire i tuoi modelli.</small></p>
+<p><a href="{{ url_for('register') }}">Non hai un account? Registrati</a></p>
 {% endblock %}
