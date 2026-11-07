@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Crea il tuo Modello di Evento Pubblico</h2>
+<form method="post" action="{{ url_for('create') }}">
+  <label>📝 Titolo Breve</label>
+  <input type="text" name="titolo" value="{{ (data or {}).get('titolo','') }}" required>
+
+  <div class="row">
+    <div>
+      <label>📅 Tipo Evento</label>
+      <select name="tipo_evento">
+        {% for o in event_options %}
+          <option value="{{ o }}" {% if (data or {}).get('tipo_evento','Any')==o %}selected{% endif %}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>👤 Partecipanti</label>
+      <select name="partecipanti">
+        {% for o in attendees_options %}
+          <option value="{{ o }}" {% if (data or {}).get('partecipanti','Any')==o %}selected{% endif %}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label>👥 N° Persone</label>
+      <select name="num_persone">
+        {% for o in people_options %}
+          <option value="{{ o }}" {% if (data or {}).get('num_persone', people_options[0])==o %}selected{% endif %}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>💰 Range Costo</label>
+      <select name="range_costo">
+        {% for o in cost_options %}
+          <option value="{{ o }}" {% if (data or {}).get('range_costo','Any')==o %}selected{% endif %}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <label>🏡 Logistica Cibo/Location</label>
+  <textarea name="logistica_cibo" rows="4">{{ (data or {}).get('logistica_cibo','') }}</textarea>
+
+  <label>🕹️ Descrizione Attività</label>
+  <textarea name="desc_attivita" rows="6">{{ (data or {}).get('desc_attivita','') }}</textarea>
+
+  <button type="submit" class="btn btn-primary">➕ Pubblica il mio Modello</button>
+</form>
+{% endblock %}

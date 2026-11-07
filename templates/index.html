@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Trova il Modello Perfetto</h2>
+<form method="get" action="{{ url_for('index') }}">
+  <div class="row">
+    <div>
+      <label>Evento</label>
+      <select name="tipo_evento">
+        {% for o in event_options %}
+          <option value="{{ o }}" {% if filters.tipo_evento == o %}selected{% endif %}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Persone</label>
+      <select name="partecipanti">
+        {% for o in attendees_options %}
+          <option value="{{ o }}" {% if filters.partecipanti == o %}selected{% endif %}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Costo</label>
+      <select name="range_costo">
+        {% for o in cost_options %}
+          <option value="{{ o }}" {% if filters.range_costo == o %}selected{% endif %}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">🔍 Cerca</button>
+</form>
+
+<p><strong>Trovati {{ results|length }} Modelli</strong></p>
+
+{% for m in results %}
+<div class="card">
+  <h3>{{ m.titolo }}</h3>
+  <p>❤️ {{ m.popolarita }} Voti | 📅 {{ m.tipo_evento }} | 👤 {{ m.partecipanti }} | 💰 {{ m.range_costo }}</p>
+  <p><em>✍️ Autore: {{ m.autore or '(anonimo)' }}</em></p>
+  <p>🏡 Logistica: {{ m.logistica_cibo }}</p>
+  <p>🕹️ Attività: {{ m.desc_attivita }}</p>
+  <form method="post" action="{{ url_for('vote', model_id=m.id_modello) }}" style="display:inline">
+    <button type="submit" class="btn">⭐ Vota</button>
+  </form>
+  {% if session.get('user') and m.autore == session.get('user') %}
+    <a class="btn" href="{{ url_for('edit', model_id=m.id_modello) }}">✏️ Modifica</a>
+    <form method="post" action="{{ url_for('delete', model_id=m.id_modello) }}" style="display:inline" onsubmit="return confirm('Eliminare questo modello?');">
+      <button type="submit" class="btn btn-danger">🗑️ Elimina</button>
+    </form>
+  {% endif %}
+</div>
+{% endfor %}
+
+{% if not results %}
+  <p>😔 Nessun modello trovato con questi filtri.</p>
+{% endif %}
+{% endblock %}

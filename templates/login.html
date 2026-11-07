@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Login</h2>
+<form method="post" action="{{ url_for('login') }}">
+  <label>👤 Nome utente</label>
+  <input type="text" name="username" required>
+  <button type="submit" class="btn btn-primary">Entra</button>
+</form>
+<p><small>Nessuna password: inserisci un nome utente per pubblicare e gestire i tuoi modelli.</small></p>
+{% endblock %}
