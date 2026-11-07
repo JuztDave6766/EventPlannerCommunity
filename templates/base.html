@@ -21,6 +21,7 @@
   <nav>
     <a href="{{ url_for('index') }}">Cerca</a> |
     <a href="{{ url_for('create') }}">Crea</a> |
+    <a href="{{ url_for('chart') }}">Grafico</a> |
     {% if session.get('user') %}
       Utente: <strong>{{ session['user'] }}</strong> | <a href="{{ url_for('logout') }}">Logout</a>
     {% else %}

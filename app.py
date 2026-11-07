@@ -134,6 +134,15 @@ def create_app(db_path=None, json_path=None):
         engine.increase_popularity(model_id)
         return redirect(request.referrer or url_for("index"))
 
+    @app.route("/chart")
+    def chart():
+        engine = get_engine()
+        results = engine.search_public_models()[:5]
+        max_pop = max((m.get("popolarita", 0) or 0) for m in results) if results else 1
+        if max_pop == 0:
+            max_pop = 1
+        return render_template("chart.html", results=results, max_pop=max_pop)
+
     return app
 
 

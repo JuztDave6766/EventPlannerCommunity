@@ -68,12 +68,15 @@ class PublicModelUI:
 
         self.search_frame = ttk.Frame(self.notebook, padding="10 10 10 10")
         self.create_frame = ttk.Frame(self.notebook, padding="10 10 10 10")
+        self.chart_frame = ttk.Frame(self.notebook, padding="10 10 10 10")
 
         self.notebook.add(self.search_frame, text="🔍 Cerca Modelli")
         self.notebook.add(self.create_frame, text="✍️ Crea Nuovo Modello")
+        self.notebook.add(self.chart_frame, text="📊 Grafico")
 
         self._setup_create_tab()
         self._setup_search_tab()
+        self._setup_chart_tab()
 
     # ---------- menu ----------
     def _build_menu(self):
@@ -356,6 +359,33 @@ class PublicModelUI:
 
         ttk.Button(frm, text="💾 Salva modifiche", command=save).grid(row=row, column=0, columnspan=2, pady=15)
 
+
+
+    # ---------- tab grafico ----------
+    def _setup_chart_tab(self):
+        ttk.Label(self.chart_frame, text="Modelli piu' popolari (Top 5)", font=("Helvetica", 14, "bold")).pack(pady=10)
+        self.chart_canvas = tk.Canvas(self.chart_frame, width=560, height=320, bg="white", highlightthickness=1, highlightbackground="#ccc")
+        self.chart_canvas.pack(pady=10)
+        ttk.Button(self.chart_frame, text="🔄 Aggiorna grafico", command=self._draw_chart).pack(pady=5)
+        self._draw_chart()
+
+    def _draw_chart(self):
+        canvas = self.chart_canvas
+        canvas.delete("all")
+        results = self.engine.search_public_models()[:5]
+        if not results:
+            canvas.create_text(280, 160, text="Nessun modello disponibile", font=("Helvetica", 11))
+            return
+        max_pop = max((m.get("popolarita", 0) or 0) for m in results) or 1
+        y = 30
+        for m in results:
+            pop = m.get("popolarita", 0) or 0
+            bar = int((pop / max_pop) * 360)
+            canvas.create_rectangle(150, y, 150 + bar, y + 22, fill="#007bff", outline="")
+            title = (m.get("titolo") or "")[:20]
+            canvas.create_text(10, y + 11, anchor="w", text=title, font=("Helvetica", 10))
+            canvas.create_text(150 + bar + 6, y + 11, anchor="w", text=str(pop), font=("Helvetica", 10, "bold"))
+            y += 46
 
 def main():
     root = tk.Tk()

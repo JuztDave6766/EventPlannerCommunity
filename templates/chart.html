@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Modelli piu' popolari (Top 5)</h2>
+{% if not results %}
+  <p>Nessun modello disponibile.</p>
+{% else %}
+  {% for m in results %}
+    {% set pop = m.popolarita or 0 %}
+    {% set pct = (pop / max_pop * 100) if max_pop else 0 %}
+    <div style="margin: 10px 0;">
+      <div style="font-weight:bold; margin-bottom:4px;">{{ m.titolo }} ({{ pop }} voti)</div>
+      <div style="background:#eee; border-radius:4px; overflow:hidden;">
+        <div style="width: {{ pct }}%; background:#007bff; color:#fff; padding:4px 8px; white-space:nowrap;">
+          {{ pop }}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}
