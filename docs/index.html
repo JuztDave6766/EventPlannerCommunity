@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>EventPlannerCommunity - Demo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav id="nav"></nav>
+<div id="flash"></div>
+
+<div id="authView">
+  <div id="loginBox">
+    <h2>Login</h2>
+    <label>Nome utente</label>
+    <input id="loginUser" type="text">
+    <label>Password</label>
+    <input id="loginPass" type="password">
+    <button class="btn btn-primary" onclick="doLogin()">Entra</button>
+    <p><a href="#" onclick="showRegister();return false;">Non hai un account? Registrati</a></p>
+  </div>
+  <div id="registerBox" class="hidden">
+    <h2>Registrazione</h2>
+    <label>Nome utente</label>
+    <input id="regUser" type="text">
+    <label>Password</label>
+    <input id="regPass" type="password">
+    <label>Conferma password</label>
+    <input id="regConfirm" type="password">
+    <button class="btn btn-primary" onclick="doRegister()">Registrati</button>
+    <p><a href="#" onclick="showLogin();return false;">Hai già un account? Accedi</a></p>
+  </div>
+</div>
+
+<div id="appView" class="hidden">
+  <p>Utente: <strong id="currentUser"></strong> <button class="btn" onclick="logout()">Logout</button></p>
+  <div>
+    <button class="btn" onclick="showTab('search')">🔍 Cerca</button>
+    <button class="btn" onclick="showTab('create')">✍️ Crea</button>
+    <button class="btn" onclick="showTab('chart')">📊 Grafico</button>
+  </div>
+
+  <div id="tab-search">
+    <h2>Trova il Modello Perfetto</h2>
+    <div class="row">
+      <div>
+        <label>Evento</label>
+        <select id="fTipo"></select>
+      </div>
+      <div>
+        <label>Persone</label>
+        <select id="fPart"></select>
+      </div>
+      <div>
+        <label>Costo</label>
+        <select id="fCosto"></select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="renderSearch()">Cerca</button>
+    <div id="results"></div>
+  </div>
+
+  <div id="tab-create" class="hidden">
+    <h2>Crea il tuo Modello</h2>
+    <form onsubmit="return createModel(event)">
+      <label>Titolo</label>
+      <input id="cTitolo" required>
+      <div class="row">
+        <div>
+          <label>Tipo Evento</label>
+          <select id="cTipo"></select>
+        </div>
+        <div>
+          <label>Partecipanti</label>
+          <select id="cPart"></select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>N° Persone</label>
+          <select id="cPers"></select>
+        </div>
+        <div>
+          <label>Range Costo</label>
+          <select id="cCosto"></select>
+        </div>
+      </div>
+      <label>Logistica</label>
+      <textarea id="cLog"></textarea>
+      <label>Attività</label>
+      <textarea id="cAtt"></textarea>
+      <button class="btn btn-primary" type="submit">Pubblica</button>
+    </form>
+  </div>
+
+  <div id="tab-chart" class="hidden">
+    <h2>Modelli più popolari (Top 5)</h2>
+    <div id="chart"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="editModal">
+  <div class="modal">
+    <h2>Modifica Modello</h2>
+    <form onsubmit="return saveEdit(event)">
+      <input type="hidden" id="eId">
+      <label>Titolo</label>
+      <input id="eTitolo" required>
+      <div class="row">
+        <div>
+          <label>Tipo Evento</label>
+          <select id="eTipo"></select>
+        </div>
+        <div>
+          <label>Partecipanti</label>
+          <select id="ePart"></select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>N° Persone</label>
+          <select id="ePers"></select>
+        </div>
+        <div>
+          <label>Range Costo</label>
+          <select id="eCosto"></select>
+        </div>
+      </div>
+      <label>Logistica</label>
+      <textarea id="eLog"></textarea>
+      <label>Attività</label>
+      <textarea id="eAtt"></textarea>
+      <button class="btn btn-primary" type="submit">Salva</button>
+      <button class="btn" type="button" onclick="closeEdit()">Annulla</button>
+    </form>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
