@@ -39,10 +39,15 @@ class PublicModelUI:
             self.style.theme_use('clam')
         except tk.TclError:
             pass
-        self.style.configure("TLabel", font=("Helvetica", 11), padding=5)
-        self.style.configure("TButton", font=("Helvetica", 11, "bold"), padding=8)
-        self.style.configure("TNotebook.Tab", font=("Helvetica", 11, "bold"))
-        self.style.configure("Card.TFrame", background="#f0f0f0", borderwidth=1, relief="solid")
+        # Palette vibrante (coerente con la web app)
+        self.style.configure("TLabel", font=("Inter", 11), padding=5, foreground="#881337", background="#FFF1F2")
+        self.style.configure("TButton", font=("Inter", 11, "bold"), padding=8, background="#E11D48", foreground="#FFFFFF")
+        self.style.map("TButton", background=[("active", "#be123c")])
+        self.style.configure("TNotebook.Tab", font=("Inter", 11, "bold"), padding=(12, 6))
+        self.style.configure("Card.TFrame", background="#FFFFFF", borderwidth=1, relief="solid")
+        self.style.configure("TFrame", background="#FFF1F2")
+        self.style.configure("TNotebook", background="#FFF1F2")
+        self.root.configure(bg="#FFF1F2")
 
         # Variabili di scelta
         self.event_options = ["Any", "New Year's Eve", "Christmas", "Birthday", "Casual Evening", "Travel"]
