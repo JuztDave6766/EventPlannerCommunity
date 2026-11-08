@@ -1,63 +1,51 @@
 # EventPlannerCommunity
 
-Un'applicazione desktop innovativa (Python/Tkinter) che si trasforma in una piattaforma di scambio sociale.
-Stanco delle solite idee per le feste? Qui puoi trovare modelli di eventi reali, creati e votati dalla community, pronti per essere copiati e personalizzati!
+Un'unica app per scoprire, condividere e votare idee per eventi. La stessa interfaccia funziona in due modalità:
 
-## Caratteristiche Principali
+- **Demo statica** su GitHub Pages: i dati restano nel browser (`localStorage`).
+- **App completa** con backend Flask + SQLite: account, sessioni e dati persistenti sul server.
 
-* **Modelli Condivisi:** Cerca eventi reali (Natale, Capodanno, Serate Casuali) creati e documentati da altri utenti.
-* **Filtri Intelligenti:** Filtra i modelli per Tipo di Evento, Partecipanti e Range di Costo (Basso, Medio, Alto).
-* **Sistema di Popolarità:** Vota i modelli migliori! I suggerimenti più votati appaiono sempre per primi.
-* **Persistenza Dati:** I modelli sono salvati in un database SQLite (`event_organizer.db`).
-* **Gestione Autori:** Ogni modello è associato a un utente; solo l'autore può modificarlo o cancellarlo.
-* **Interfaccia Intuitiva:** App desktop Tkinter e app web Flask (condividono lo stesso database).
+## Caratteristiche
 
-## Tecnologia
+- Ricerca per tipo evento, partecipanti e range di costo.
+- Creazione, modifica e cancellazione delle proprie idee.
+- Voti della community e classifica Top 5.
+- Registrazione/login con password (hash) e sessioni HttpOnly.
+- UI responsive, accessibile e con micro-animazioni (rispetta `prefers-reduced-motion`).
 
-* **Linguaggio:** Python 3.x
-* **Interfaccia Utente:** Tkinter (desktop) / Flask + Jinja (web)
-* **Database:** SQLite
+## Struttura
 
-## Come Eseguire l'Applicazione
-
-### Prerequisiti
-Avrai bisogno di Python 3 installato sulla tua macchina.
-
-```bash
-python --version
+```
+docs/            # La UI unica (SPA statica) servita da GitHub Pages e da Flask
+  index.html
+  style.css
+  app.js
+app.py           # Backend Flask: serve la SPA + API JSON
+engine.py        # Motore SQLite (modelli, utenti, migrazione JSON)
+tests/           # Test del motore e delle API
+.github/workflows/pages.yml  # Deploy automatico della demo su GitHub Pages
 ```
 
-### Installazione
+## Eseguire l'app completa in locale
 
 ```bash
-git clone https://github.com/JuztDave6766/EventPlannerCommunity.git
-cd EventPlannerCommunity
 pip install -r requirements.txt
-```
-
-### App desktop (Tkinter)
-
-```bash
-python event_organizer.py
-```
-
-### App web (Flask)
-
-```bash
 python app.py
 ```
 
-Poi apri http://127.0.0.1:5000 nel browser.
+Apri http://127.0.0.1:5000
 
-## Come Contribuire
+Al primo avvio il database SQLite (`event_organizer.db`) viene creato e popolato con alcune idee dimostrative. La modalità backend viene rilevata automaticamente dalla UI.
 
-Sei un appassionato di eventi o uno sviluppatore Python? Il tuo contributo è fondamentale!
+## Eseguire la demo statica
 
-1. Fai un Fork del progetto.
-2. Crea un nuovo Branch per la tua funzionalità (`git checkout -b feature/AmazingFeature`).
-3. Implementa e committa le tue modifiche (`git commit -m 'Add some AmazingFeature'`).
-4. Esegui il Push del tuo Branch (`git push origin feature/AmazingFeature`).
-5. Apri una Pull Request!
+La UI può essere aperta direttamente da `docs/index.html` oppure pubblicata su GitHub Pages. In assenza del backend, l'app passa automaticamente alla modalità demo e salva i dati nel browser.
+
+### GitHub Pages
+
+Il workflow `.github/workflows/pages.yml` pubblica la cartella `docs/` ad ogni push su `main`. Basta impostare **Settings → Pages → Source: GitHub Actions**.
+
+URL: `https://JuztDave6766.github.io/EventPlannerCommunity/`
 
 ## Test
 
@@ -65,10 +53,33 @@ Sei un appassionato di eventi o uno sviluppatore Python? Il tuo contributo è fo
 python -m pytest -q
 ```
 
-## Prossimi Sviluppi (Roadmap)
+## API principali
 
-* [x] Migrare la persistenza a SQLite.
-* [x] Implementare modifica/cancellazione dei propri modelli.
-* [x] Aggiungere versione web (Flask).
-* [ ] Aggiungere un grafico di visualizzazione dei modelli più popolari.
-* [ ] Migliorare l'autenticazione (password, sessioni sicure).
+| Metodo | Endpoint | Descrizione |
+|--------|----------|-------------|
+| GET | `/api/health` | Rilevamento backend |
+| GET | `/api/models` | Elenco idee |
+| POST | `/api/models` | Crea idea (login) |
+| PUT | `/api/models/<id>` | Modifica idea (autore) |
+| DELETE | `/api/models/<id>` | Elimina idea (autore) |
+| POST | `/api/models/<id>/vote` | Vota idea |
+| POST | `/api/auth/register` | Registrazione |
+| POST | `/api/auth/login` | Login |
+| POST | `/api/auth/logout` | Logout |
+| GET | `/api/auth/me` | Utente corrente |
+
+## Deploy del backend
+
+Il file `Procfile` è pronto per host che eseguono `gunicorn` (es. Railway, Render). Imposta la variabile d'ambiente `SECRET_KEY` con un valore sicuro.
+
+> Nota: GitHub Pages ospita solo la demo statica. Per l'app completa con database serve un host Python.
+
+## Roadmap
+
+- [x] Migrazione a SQLite.
+- [x] Modifica/cancellazione dei propri modelli.
+- [x] Versione web unificata.
+- [x] Grafico dei modelli più popolari.
+- [x] Autenticazione con password.
+- [ ] Deploy del backend su un host Python.
+- [ ] Notifiche e attività della community.

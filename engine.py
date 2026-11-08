@@ -118,7 +118,7 @@ class PublicEngine:
                         desc_attivita: str, autore: str = "") -> bool:
         try:
             with self._connect() as conn:
-                conn.execute(
+                cur = conn.execute(
                     """
                     INSERT INTO models
                     (titolo, tipo_evento, partecipanti, num_persone,
@@ -129,9 +129,9 @@ class PublicEngine:
                      range_costo, logistica_cibo, desc_attivita, 0, autore or ""),
                 )
                 conn.commit()
-            return True
+            return cur.lastrowid
         except sqlite3.Error:
-            return False
+            return None
 
     def search_public_models(self, tipo_evento=None, partecipanti=None,
                             range_costo=None):

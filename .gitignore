@@ -3,4 +3,7 @@ __pycache__/
 *.db
 *.db-journal
 user_config.json
+public_events.json
 public_events.json.bak
+.pytest_cache/
+.DS_Store

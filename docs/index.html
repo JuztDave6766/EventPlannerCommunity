@@ -1,141 +1,233 @@
 <!doctype html>
 <html lang="it">
 <head>
-<meta charset="utf-8">
-<title>EventPlannerCommunity - Demo</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#E11D48">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23E11D48'/%3E%3Cpath d='M16 6l2.1 6.4a2 2 0 001.3 1.3L26 16l-6.6 2.3a2 2 0 00-1.3 1.3L16 26l-2.1-6.4a2 2 0 00-1.3-1.3L6 16l6.6-2.3a2 2 0 001.3-1.3z' fill='%23fff'/%3E%3C/svg%3E">
+  <title>EventPlanner — Idee che fanno festa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<nav id="nav"></nav>
-<div id="flash"></div>
+  <svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" aria-hidden="true">
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  </svg>
 
-<div id="authView">
-  <div id="loginBox">
-    <h2>Login</h2>
-    <label>Nome utente</label>
-    <input id="loginUser" type="text">
-    <label>Password</label>
-    <input id="loginPass" type="password">
-    <button class="btn btn-primary" onclick="doLogin()">Entra</button>
-    <p><a href="#" onclick="showRegister();return false;">Non hai un account? Registrati</a></p>
-  </div>
-  <div id="registerBox" class="hidden">
-    <h2>Registrazione</h2>
-    <label>Nome utente</label>
-    <input id="regUser" type="text">
-    <label>Password</label>
-    <input id="regPass" type="password">
-    <label>Conferma password</label>
-    <input id="regConfirm" type="password">
-    <button class="btn btn-primary" onclick="doRegister()">Registrati</button>
-    <p><a href="#" onclick="showLogin();return false;">Hai già un account? Accedi</a></p>
-  </div>
-</div>
-
-<div id="appView" class="hidden">
-  <p>Utente: <strong id="currentUser"></strong> <button class="btn" onclick="logout()">Logout</button></p>
-  <div>
-    <button class="btn" onclick="showTab('search')">🔍 Cerca</button>
-    <button class="btn" onclick="showTab('create')">✍️ Crea</button>
-    <button class="btn" onclick="showTab('chart')">📊 Grafico</button>
+  <div class="bg-decor" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+    <span class="dot dot-1"></span>
+    <span class="dot dot-2"></span>
+    <span class="dot dot-3"></span>
+    <span class="squiggle squiggle-1"></span>
   </div>
 
-  <div id="tab-search">
-    <h2>Trova il Modello Perfetto</h2>
-    <div class="row">
-      <div>
-        <label>Evento</label>
-        <select id="fTipo"></select>
-      </div>
-      <div>
-        <label>Persone</label>
-        <select id="fPart"></select>
-      </div>
-      <div>
-        <label>Costo</label>
-        <select id="fCosto"></select>
-      </div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="EventPlanner home" onclick="goHome();return false;">
+      <span class="brand-mark"><svg class="icon"><use href="#i-spark"/></svg></span>
+      <span class="brand-name">EventPlanner</span>
+      <span class="brand-tag">community</span>
+    </a>
+    <nav class="topnav hidden" id="topnav" aria-label="Navigazione principale">
+      <button class="nav-link is-active" type="button" data-view="explore">Scopri</button>
+      <button class="nav-link" type="button" data-view="create">Crea</button>
+      <button class="nav-link" type="button" data-view="chart">Classifica</button>
+    </nav>
+    <div class="topbar-actions">
+      <span id="modeBadge" class="mode-badge" hidden></span>
+      <div id="userArea" class="user-area"></div>
+      <button class="btn btn-primary btn-sm" id="loginCta" type="button">Accedi</button>
     </div>
-    <button class="btn btn-primary" onclick="renderSearch()">Cerca</button>
-    <div id="results"></div>
-  </div>
+  </header>
 
-  <div id="tab-create" class="hidden">
-    <h2>Crea il tuo Modello</h2>
-    <form onsubmit="return createModel(event)">
-      <label>Titolo</label>
-      <input id="cTitolo" required>
-      <div class="row">
-        <div>
-          <label>Tipo Evento</label>
-          <select id="cTipo"></select>
+  <main class="page">
+    <section id="landingView" class="landing">
+      <div class="hero">
+        <p class="eyebrow"><svg class="icon"><use href="#i-spark"/></svg> La community delle idee</p>
+        <h1>Trova l'idea giusta.<br><span class="grad">Fai una festa indimenticabile.</span></h1>
+        <p class="hero-sub">Scopri, copia e vota i modelli di eventi creati dalla community. O condividi il tuo: qualcuno la copierà per la sua prossima festa.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" id="heroRegister" type="button">Inizia gratis <svg class="icon"><use href="#i-arrow"/></svg></button>
+          <button class="btn btn-ghost btn-lg" id="heroLogin" type="button">Ho già un account</button>
         </div>
-        <div>
-          <label>Partecipanti</label>
-          <select id="cPart"></select>
+        <div class="hero-stats">
+          <div><strong id="statModels">0</strong><span>idee condivise</span></div>
+          <div><strong id="statVotes">0</strong><span>voti della community</span></div>
+          <div><strong id="statAuthors">0</strong><span>autori</span></div>
         </div>
       </div>
-      <div class="row">
-        <div>
-          <label>N° Persone</label>
-          <select id="cPers"></select>
+
+      <aside class="auth-card" id="authCard" aria-label="Accesso">
+        <div class="auth-tabs" role="tablist">
+          <button class="auth-tab is-active" type="button" data-auth="login" role="tab" aria-selected="true">Accedi</button>
+          <button class="auth-tab" type="button" data-auth="register" role="tab" aria-selected="false">Registrati</button>
         </div>
+        <form id="loginForm" class="auth-form" autocomplete="on">
+          <label for="loginUser">Nome utente</label>
+          <input id="loginUser" name="username" type="text" autocomplete="username" required>
+          <label for="loginPass">Password</label>
+          <input id="loginPass" name="password" type="password" autocomplete="current-password" required>
+          <button class="btn btn-primary btn-block" type="submit">Entra</button>
+        </form>
+        <form id="registerForm" class="auth-form hidden" autocomplete="on">
+          <label for="regUser">Nome utente</label>
+          <input id="regUser" name="username" type="text" autocomplete="username" minlength="3" required>
+          <label for="regPass">Password</label>
+          <input id="regPass" name="password" type="password" autocomplete="new-password" minlength="4" required>
+          <label for="regConfirm">Conferma password</label>
+          <input id="regConfirm" name="confirm" type="password" autocomplete="new-password" minlength="4" required>
+          <button class="btn btn-primary btn-block" type="submit">Crea account</button>
+        </form>
+        <p class="auth-note" id="authNote">Modalità demo: i dati restano nel tuo browser.</p>
+      </aside>
+    </section>
+
+    <section id="appView" class="app hidden">
+      <div class="app-hero">
         <div>
-          <label>Range Costo</label>
-          <select id="cCosto"></select>
+          <p class="eyebrow">Ciao, <span id="greetingName">amico</span></p>
+          <h1>Che cosa festeggiamo oggi?</h1>
+          <p>Trova l'ispirazione, personalizza un'idea o lancia la tua nella community.</p>
         </div>
+        <button class="btn btn-primary btn-lg" id="newIdeaBtn" type="button"><svg class="icon"><use href="#i-plus"/></svg> Nuova idea</button>
       </div>
-      <label>Logistica</label>
-      <textarea id="cLog"></textarea>
-      <label>Attività</label>
-      <textarea id="cAtt"></textarea>
-      <button class="btn btn-primary" type="submit">Pubblica</button>
-    </form>
+
+      <section id="view-explore" class="view">
+        <div class="search-panel" role="search">
+          <div class="field">
+            <label for="filterTipo">Tipo evento</label>
+            <select id="filterTipo"></select>
+          </div>
+          <div class="field">
+            <label for="filterPart">Partecipanti</label>
+            <select id="filterPart"></select>
+          </div>
+          <div class="field">
+            <label for="filterCosto">Range costo</label>
+            <select id="filterCosto"></select>
+          </div>
+          <button class="btn btn-primary" id="searchBtn" type="button"><svg class="icon"><use href="#i-search"/></svg> Cerca</button>
+        </div>
+        <div class="results-head">
+          <h2>Idee dalla community</h2>
+          <span id="resultsCount" class="pill">0 idee</span>
+        </div>
+        <div id="results" class="cards-grid"></div>
+      </section>
+
+      <section id="view-create" class="view hidden">
+        <div class="form-card">
+          <div class="form-head">
+            <h2>Condividi la tua idea</h2>
+            <p>Racconta l'evento in modo chiaro: qualcuno lo userà come punto di partenza.</p>
+          </div>
+          <form id="createForm">
+            <label for="cTitolo">Titolo</label>
+            <input id="cTitolo" name="titolo" type="text" maxlength="80" required>
+            <div class="form-grid">
+              <div>
+                <label for="cTipo">Tipo evento</label>
+                <select id="cTipo" name="tipo_evento"></select>
+              </div>
+              <div>
+                <label for="cPart">Partecipanti</label>
+                <select id="cPart" name="partecipanti"></select>
+              </div>
+              <div>
+                <label for="cPers">N° persone</label>
+                <select id="cPers" name="num_persone"></select>
+              </div>
+              <div>
+                <label for="cCosto">Range costo</label>
+                <select id="cCosto" name="range_costo"></select>
+              </div>
+            </div>
+            <label for="cLog">Logistica cibo/location</label>
+            <textarea id="cLog" name="logistica_cibo" rows="3" required></textarea>
+            <label for="cAtt">Descrizione attività</label>
+            <textarea id="cAtt" name="desc_attivita" rows="5" required></textarea>
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit"><svg class="icon"><use href="#i-plus"/></svg> Pubblica idea</button>
+              <button class="btn btn-ghost" type="button" data-view="explore">Annulla</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="view-chart" class="view hidden">
+        <div class="chart-card">
+          <div class="form-head">
+            <h2>Le idee più amate</h2>
+            <p>La top 5 della community, ordinata per voti.</p>
+          </div>
+          <div id="chart" class="chart"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="editModal" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+      <div class="modal-head">
+        <h2 id="editTitle">Modifica idea</h2>
+        <button class="icon-btn" id="closeEdit" type="button" aria-label="Chiudi"><svg class="icon"><use href="#i-close"/></svg></button>
+      </div>
+      <form id="editForm">
+        <input id="eId" type="hidden">
+        <label for="eTitolo">Titolo</label>
+        <input id="eTitolo" type="text" maxlength="80" required>
+        <div class="form-grid">
+          <div>
+            <label for="eTipo">Tipo evento</label>
+            <select id="eTipo"></select>
+          </div>
+          <div>
+            <label for="ePart">Partecipanti</label>
+            <select id="ePart"></select>
+          </div>
+          <div>
+            <label for="ePers">N° persone</label>
+            <select id="ePers"></select>
+          </div>
+          <div>
+            <label for="eCosto">Range costo</label>
+            <select id="eCosto"></select>
+          </div>
+        </div>
+        <label for="eLog">Logistica cibo/location</label>
+        <textarea id="eLog" rows="3" required></textarea>
+        <label for="eAtt">Descrizione attività</label>
+        <textarea id="eAtt" rows="5" required></textarea>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Salva modifiche</button>
+          <button class="btn btn-ghost" type="button" id="cancelEdit">Annulla</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <div id="tab-chart" class="hidden">
-    <h2>Modelli più popolari (Top 5)</h2>
-    <div id="chart"></div>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="editModal">
-  <div class="modal">
-    <h2>Modifica Modello</h2>
-    <form onsubmit="return saveEdit(event)">
-      <input type="hidden" id="eId">
-      <label>Titolo</label>
-      <input id="eTitolo" required>
-      <div class="row">
-        <div>
-          <label>Tipo Evento</label>
-          <select id="eTipo"></select>
-        </div>
-        <div>
-          <label>Partecipanti</label>
-          <select id="ePart"></select>
-        </div>
-      </div>
-      <div class="row">
-        <div>
-          <label>N° Persone</label>
-          <select id="ePers"></select>
-        </div>
-        <div>
-          <label>Range Costo</label>
-          <select id="eCosto"></select>
-        </div>
-      </div>
-      <label>Logistica</label>
-      <textarea id="eLog"></textarea>
-      <label>Attività</label>
-      <textarea id="eAtt"></textarea>
-      <button class="btn btn-primary" type="submit">Salva</button>
-      <button class="btn" type="button" onclick="closeEdit()">Annulla</button>
-    </form>
-  </div>
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

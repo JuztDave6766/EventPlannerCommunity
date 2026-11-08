@@ -1,175 +1,214 @@
 import os
 
 from flask import (
-    Flask, render_template, request, redirect, url_for,
-    session, flash, current_app,
+    Flask, jsonify, request, session, send_from_directory,
 )
 
 from engine import PublicEngine
 
-EVENT_OPTIONS = ["Any", "New Year's Eve", "Christmas", "Birthday", "Casual Evening", "Travel"]
-ATTENDEES_OPTIONS = ["Any", "Relatives", "Friends", "Couple", "Colleagues"]
-COST_OPTIONS = ["Any", "Basso (€ <50)", "Medio (€ 50-200)", "Alto (€ >200)"]
-PEOPLE_OPTIONS = ["2-4", "5-10", "10+"]
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DOCS_DIR = os.path.join(BASE_DIR, "docs")
 
+MODEL_FIELDS = (
+    "titolo", "tipo_evento", "partecipanti", "num_persone",
+    "range_costo", "logistica_cibo", "desc_attivita",
+)
 
-def get_engine():
-    return current_app.config["ENGINE"]
+SEED_MODELS = [
+    {
+        "titolo": "Pranzo di Natale",
+        "votes": 12,
+        "tipo_evento": "Christmas",
+        "partecipanti": "Relatives",
+        "num_persone": "10+",
+        "range_costo": "Medio (€ 50-200)",
+        "logistica_cibo": "Casa di famiglia, ognuno porta un piatto",
+        "desc_attivita": "Pranzo lento, tombolata pomeridiana e scambio regali sotto l'albero.",
+    },
+    {
+        "titolo": "Capodanno con amici",
+        "votes": 24,
+        "tipo_evento": "New Year's Eve",
+        "partecipanti": "Friends",
+        "num_persone": "10+",
+        "range_costo": "Alto (€ >200)",
+        "logistica_cibo": "Locale prenotato con buffet e open bar",
+        "desc_attivita": "Cena, playlist condivisa, countdown e brindisi a mezzanotte.",
+    },
+    {
+        "titolo": "Serata giochi da tavolo",
+        "votes": 18,
+        "tipo_evento": "Casual Evening",
+        "partecipanti": "Friends",
+        "num_persone": "5-10",
+        "range_costo": "Basso (€ <50)",
+        "logistica_cibo": "Pizza a domicilio e snack fatti in casa",
+        "desc_attivita": "Torneo a squadre, giochi veloci e premio finale divertente.",
+    },
+    {
+        "titolo": "Compleanno a sorpresa",
+        "votes": 9,
+        "tipo_evento": "Birthday",
+        "partecipanti": "Friends",
+        "num_persone": "5-10",
+        "range_costo": "Medio (€ 50-200)",
+        "logistica_cibo": "Torta personalizzata e aperitivo in terrazza",
+        "desc_attivita": "Scavenger hunt in città e festa finale con foto polaroid.",
+    },
+    {
+        "titolo": "Weekend fuori porta",
+        "votes": 15,
+        "tipo_evento": "Travel",
+        "partecipanti": "Couple",
+        "num_persone": "2-4",
+        "range_costo": "Alto (€ >200)",
+        "logistica_cibo": "B&B con colazione e cena tipica locale",
+        "desc_attivita": "Due giorni tra borghi, passeggiate e mercatini.",
+    },
+]
 
 
 def create_app(db_path=None, json_path=None):
-    app = Flask(__name__, template_folder="templates", static_folder="static")
+    app = Flask(__name__, static_folder=None)
     app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-me")
     app.config.update(
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=False,
     )
-    app.config["ENGINE"] = PublicEngine(
+    eng = PublicEngine(
         db_path=db_path or os.environ.get("DB_PATH", "event_organizer.db"),
         json_path=json_path or os.environ.get("JSON_PATH", "public_events.json"),
     )
+    app.config["ENGINE"] = eng
+    if db_path is None and os.environ.get("SEED_DEMO", "1") != "0":
+        if not eng.search_public_models():
+            for model in SEED_MODELS:
+                votes = model.get("votes", 0)
+                data = {k: v for k, v in model.items() if k != "votes"}
+                new_id = eng.add_public_model(autore="community", **data)
+                for _ in range(votes):
+                    eng.increase_popularity(new_id)
 
-    @app.context_processor
-    def inject_opts():
-        return dict(
-            event_options=EVENT_OPTIONS,
-            attendees_options=ATTENDEES_OPTIONS,
-            cost_options=COST_OPTIONS,
-            people_options=PEOPLE_OPTIONS,
-        )
+    def engine():
+        return app.config["ENGINE"]
 
-    def _extract_form(form):
-        return {
-            "titolo": form.get("titolo", "").strip(),
-            "tipo_evento": form.get("tipo_evento"),
-            "partecipanti": form.get("partecipanti"),
-            "num_persone": form.get("num_persone"),
-            "range_costo": form.get("range_costo"),
-            "logistica_cibo": form.get("logistica_cibo", "").strip(),
-            "desc_attivita": form.get("desc_attivita", "").strip(),
-        }
+    def model_payload(data):
+        return {k: (data.get(k) or "").strip() for k in MODEL_FIELDS}
 
-    def _validate(data):
+    def validate_model(data):
         if not all(data.values()):
             return "Compila tutti i campi!"
-        if data["tipo_evento"] == "Any" or data["partecipanti"] == "Any" or data["range_costo"] == "Any":
+        if "Any" in (data["tipo_evento"], data["partecipanti"], data["range_costo"]):
             return "Specifica Tipo Evento, Partecipanti e Range Costo."
         return None
 
+    # ---------- SPA statica (stessa UI per GitHub Pages e Flask) ----------
     @app.route("/")
     def index():
-        engine = get_engine()
+        return send_from_directory(DOCS_DIR, "index.html")
+
+    @app.route("/style.css")
+    def style_css():
+        return send_from_directory(DOCS_DIR, "style.css")
+
+    @app.route("/app.js")
+    def app_js():
+        return send_from_directory(DOCS_DIR, "app.js")
+
+    # ---------- API ----------
+    @app.route("/api/health")
+    def api_health():
+        return jsonify(ok=True, mode="backend")
+
+    @app.route("/api/auth/me")
+    def api_me():
+        return jsonify(user=session.get("user"))
+
+    @app.route("/api/auth/register", methods=["POST"])
+    def api_register():
+        data = request.get_json(silent=True) or {}
+        username = (data.get("username") or "").strip()
+        password = data.get("password") or ""
+        if not username or not password:
+            return jsonify(error="Compila tutti i campi"), 400
+        if len(username) < 3:
+            return jsonify(error="Il nome utente deve avere almeno 3 caratteri"), 400
+        if len(password) < 4:
+            return jsonify(error="La password deve avere almeno 4 caratteri"), 400
+        if not engine().register_user(username, password):
+            return jsonify(error="Utente già esistente"), 409
+        session["user"] = username
+        return jsonify(user=username), 201
+
+    @app.route("/api/auth/login", methods=["POST"])
+    def api_login():
+        data = request.get_json(silent=True) or {}
+        username = (data.get("username") or "").strip()
+        password = data.get("password") or ""
+        if not engine().verify_user(username, password):
+            return jsonify(error="Credenziali non valide"), 401
+        session["user"] = username
+        return jsonify(user=username)
+
+    @app.route("/api/auth/logout", methods=["POST"])
+    def api_logout():
+        session.pop("user", None)
+        return jsonify(ok=True)
+
+    @app.route("/api/models")
+    def api_models():
         tipo = request.args.get("tipo_evento", "Any")
         part = request.args.get("partecipanti", "Any")
         costo = request.args.get("range_costo", "Any")
-        results = engine.search_public_models(tipo, part, costo)
-        filters = {"tipo_evento": tipo, "partecipanti": part, "range_costo": costo}
-        return render_template("index.html", results=results, filters=filters)
+        return jsonify(engine().search_public_models(tipo, part, costo))
 
-    @app.route("/login", methods=["GET", "POST"])
-    def login():
-        if request.method == "POST":
-            username = request.form.get("username", "").strip()
-            password = request.form.get("password", "")
-            engine = get_engine()
-            if engine.verify_user(username, password):
-                session["user"] = username
-                flash(f"Benvenuto, {username}")
-                return redirect(url_for("index"))
-            flash("Credenziali non valide o utente non registrato")
-            return redirect(url_for("login"))
-        return render_template("login.html")
+    @app.route("/api/models", methods=["POST"])
+    def api_create_model():
+        user = session.get("user")
+        if not user:
+            return jsonify(error="Devi fare login"), 401
+        data = model_payload(request.get_json(silent=True) or {})
+        err = validate_model(data)
+        if err:
+            return jsonify(error=err), 400
+        new_id = engine().add_public_model(autore=user, **data)
+        if not new_id:
+            return jsonify(error="Errore durante il salvataggio"), 500
+        return jsonify(engine().get_model(new_id)), 201
 
-    @app.route("/register", methods=["GET", "POST"])
-    def register():
-        if request.method == "POST":
-            username = request.form.get("username", "").strip()
-            password = request.form.get("password", "")
-            confirm = request.form.get("confirm", "")
-            if not username or not password:
-                flash("Compila tutti i campi")
-                return redirect(url_for("register"))
-            if password != confirm:
-                flash("Le password non coincidono")
-                return redirect(url_for("register"))
-            engine = get_engine()
-            if not engine.register_user(username, password):
-                flash("Utente gia' esistente o errore")
-                return redirect(url_for("register"))
-            session["user"] = username
-            flash("Registrazione completata")
-            return redirect(url_for("index"))
-        return render_template("register.html")
-
-    @app.route("/logout")
-    def logout():
-        session.pop("user", None)
-        return redirect(url_for("index"))
-
-    @app.route("/create", methods=["GET", "POST"])
-    def create():
-        if not session.get("user"):
-            flash("Devi fare login per creare un modello")
-            return redirect(url_for("login"))
-        if request.method == "POST":
-            data = _extract_form(request.form)
-            err = _validate(data)
-            if err:
-                flash(err)
-                return render_template("create.html", data=data)
-            engine = get_engine()
-            if engine.add_public_model(autore=session["user"], **data):
-                flash("Modello pubblicato con successo!")
-                return redirect(url_for("index"))
-            flash("Problema nel salvataggio del Modello.")
-        return render_template("create.html", data={})
-
-    @app.route("/edit/<int:model_id>", methods=["GET", "POST"])
-    def edit(model_id):
-        engine = get_engine()
-        model = engine.get_model(model_id)
+    @app.route("/api/models/<int:model_id>", methods=["PUT"])
+    def api_update_model(model_id):
+        user = session.get("user")
+        if not user:
+            return jsonify(error="Devi fare login"), 401
+        model = engine().get_model(model_id)
         if not model:
-            flash("Modello non trovato")
-            return redirect(url_for("index"))
-        if model.get("autore") != session.get("user"):
-            flash("Non sei autorizzato a modificare questo modello")
-            return redirect(url_for("index"))
-        if request.method == "POST":
-            data = _extract_form(request.form)
-            err = _validate(data)
-            if err:
-                flash(err)
-                return render_template("edit.html", model=model, data=data)
-            if engine.update_public_model(model_id, session["user"], **data):
-                flash("Modello aggiornato!")
-                return redirect(url_for("index"))
-            flash("Impossibile aggiornare il modello.")
-        return render_template("edit.html", model=model, data=model)
+            return jsonify(error="Modello non trovato"), 404
+        if model.get("autore") != user:
+            return jsonify(error="Non sei autorizzato"), 403
+        data = model_payload(request.get_json(silent=True) or {})
+        err = validate_model(data)
+        if err:
+            return jsonify(error=err), 400
+        if not engine().update_public_model(model_id, user, **data):
+            return jsonify(error="Errore durante l'aggiornamento"), 500
+        return jsonify(engine().get_model(model_id))
 
-    @app.route("/delete/<int:model_id>", methods=["POST"])
-    def delete(model_id):
-        engine = get_engine()
-        if engine.delete_public_model(model_id, session.get("user", "")):
-            flash("Modello eliminato.")
-        else:
-            flash("Impossibile eliminare il modello.")
-        return redirect(url_for("index"))
+    @app.route("/api/models/<int:model_id>", methods=["DELETE"])
+    def api_delete_model(model_id):
+        user = session.get("user")
+        if not user:
+            return jsonify(error="Devi fare login"), 401
+        if not engine().delete_public_model(model_id, user):
+            return jsonify(error="Impossibile eliminare il modello"), 403
+        return jsonify(ok=True)
 
-    @app.route("/vote/<int:model_id>", methods=["POST"])
-    def vote(model_id):
-        engine = get_engine()
-        engine.increase_popularity(model_id)
-        return redirect(request.referrer or url_for("index"))
-
-    @app.route("/chart")
-    def chart():
-        engine = get_engine()
-        results = engine.search_public_models()[:5]
-        max_pop = max((m.get("popolarita", 0) or 0) for m in results) if results else 1
-        if max_pop == 0:
-            max_pop = 1
-        return render_template("chart.html", results=results, max_pop=max_pop)
+    @app.route("/api/models/<int:model_id>/vote", methods=["POST"])
+    def api_vote_model(model_id):
+        if not engine().increase_popularity(model_id):
+            return jsonify(error="Modello non trovato"), 404
+        return jsonify(engine().get_model(model_id))
 
     return app
 
